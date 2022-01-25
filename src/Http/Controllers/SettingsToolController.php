@@ -42,6 +42,14 @@ class SettingsToolController
             ->keyBy('key')
             ->all();
 
+        foreach ($panels as $title => $panel) {
+            if (!auth(env('NOVA_GUARD', 'web'))->user()->isSuperAdmin()
+                && !(strtolower($title) === 'seo' && auth(env('NOVA_GUARD', 'web'))->user()->hasRole('seo'))
+            ) {
+                unset($panels[$title]);
+            }
+        }
+
         return response()->json([
             'title' => config('nova-settings-tool.title', 'Settings'),
             'settings' => $settings,
